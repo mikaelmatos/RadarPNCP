@@ -1,14 +1,40 @@
-﻿using System;
+﻿using RadarPNCP.Models;
+using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
 
 namespace RadarPNCP.Htmls
 {
     public class Base
     {
-        public static string HomeDarkLight()
+        public static string AtualizarDados(List<LicitacaoResumo> licitacoesResumo)
         {
-            return @"
+            if (licitacoesResumo == null)
+                licitacoesResumo = new List<LicitacaoResumo>();
+
+            string json = JsonSerializer.Serialize(licitacoesResumo);
+
+            return $@"
+                (function() {{
+                    DB.length = 0;
+                    const novos = {json};
+                    novos.forEach(r => DB.push(r));
+                    filtrar();
+                }})();
+            ";
+        }
+        public static string HomeDarkLight(List<LicitacaoResumo> licitacoesResumo = null)
+        {
+            if (licitacoesResumo == null)
+            {
+                licitacoesResumo = new List<LicitacaoResumo>();
+            }
+
+            string jsonLicitacoesResumo = JsonSerializer.Serialize(licitacoesResumo);
+
+            string resposta = 
+                @"
                 <!DOCTYPE html>
                 <html lang=""pt-BR"">
                 <head>
@@ -399,167 +425,163 @@ namespace RadarPNCP.Htmls
                 </div>
 
                 <script>
-                const DB = [
-                  {Id:1, Url:'https://pncp.gov.br/app/editais/03424272000107/2026/6', Modalidade:'Pregão - Eletrônico', Orgao:'MUNICIPIO DE NOBRES', Objeto:'REGISTRO DE PREÇOS PARA CONTRATAÇÃO DE LICENCIAMENTO, IMPLANTAÇÃO E CUSTOMIZAÇÃO DO SISTEMA ÚNICO E INTEGRADO DE EXECUÇÃO ORÇAMENTÁRIA (SIAFIC), COM SUPORTE TÉCNICO E HOSPEDAGEM EM DATACENTER', Local:'Nobres/MT', Dt:'20/03/2026', Nota:7},
-                  {Id:2, Url:'https://pncp.gov.br/app/editais/87613386000195/2026/251', Modalidade:'Pregão - Eletrônico', Orgao:'MUNICIPIO DE MARIANO MORO', Objeto:'CONTRATAÇÃO DE EMPRESA ESPECIALIZADA NO FORNECIMENTO DE LOCAÇÃO DE SISTEMAS E SOFTWARES DE GESTÃO PÚBLICA', Local:'Mariano Moro/RS', Dt:'20/03/2026', Nota:8},
-                  {Id:3, Url:'https://pncp.gov.br/app/editais/83102400000135/2025/265', Modalidade:'Pregão - Eletrônico', Orgao:'MUNICIPIO DE TRES BARRAS', Objeto:'CONTRATAÇÃO DE EMPRESA PARA LOCAÇÃO DE SISTEMA WEB INTEGRADO DE GESTÃO PÚBLICA MUNICIPAL EM NUVEM, INCLUINDO IMPLANTAÇÃO, MANUTENÇÃO, SUPORTE E TREINAMENTO', Local:'Três Barras/SC', Dt:'19/03/2026', Nota:7},
-                  {Id:4, Url:'https://pncp.gov.br/app/editais/83102327000100/2026/45', Modalidade:'Pregão - Eletrônico', Orgao:'MUNICIPIO DE PENHA', Objeto:'Locação de sistema web integrado de gestão pública municipal com suporte e manutenção contínua.', Local:'Penha/SC', Dt:'19/03/2026', Nota:8},
-                  {Id:5, Url:'https://pncp.gov.br/app/editais/13627823000193/2026/8', Modalidade:'Pregão - Eletrônico', Orgao:'MUNICIPIO DE SERRA PRETA', Objeto:'Contratação de empresa especializada na locação de softwares, Diário Oficial, Transparência parametrizados com PNCP, Protocolo e Site Institucional.', Local:'Serra Preta/BA', Dt:'19/03/2026', Nota:8},
-                  {Id:6, Url:'https://pncp.gov.br/app/editais/02295640000100/2026/8', Modalidade:'Pregão - Presencial', Orgao:'MUNICIPIO DE URUANA', Objeto:'AQUISIÇÃO PARCELADA DE MATERIAIS GRÁFICOS E VISUAIS PARA O PERÍODO DE 12 MESES PARA DIVERSAS SECRETARIAS MUNICIPAIS', Local:'Uruana/GO', Dt:'19/03/2026', Nota:3},
-                  {Id:7, Url:'https://pncp.gov.br/app/editais/12345678000100/2026/12', Modalidade:'Pregão - Eletrônico', Orgao:'MUNICIPIO DE CAMPO VERDE', Objeto:'Contratação de empresa para fornecimento de sistema de gestão municipal integrado com módulos de contabilidade, RH e patrimônio.', Local:'Campo Verde/MT', Dt:'18/03/2026', Nota:9},
-                  {Id:8, Url:'https://pncp.gov.br/app/editais/98765432000100/2026/33', Modalidade:'Concorrência', Orgao:'PREFEITURA DE JOINVILLE', Objeto:'Contratação de serviços de tecnologia da informação para modernização da infraestrutura de TI municipal.', Local:'Joinville/SC', Dt:'17/03/2026', Nota:6},
-                  {Id:9, Url:'https://pncp.gov.br/app/editais/11223344000100/2026/7', Modalidade:'Pregão - Eletrônico', Orgao:'MUNICIPIO DE PALMAS', Objeto:'Locação de solução de software para gestão de saúde pública municipal com prontuário eletrônico e agendamento online.', Local:'Palmas/TO', Dt:'17/03/2026', Nota:8},
-                  {Id:10, Url:'https://pncp.gov.br/app/editais/55667788000100/2026/19', Modalidade:'Pregão - Presencial', Orgao:'MUNICIPIO DE ITAJAI', Objeto:'Aquisição de equipamentos de informática para as secretarias municipais incluindo notebooks, impressoras e monitores.', Local:'Itajaí/SC', Dt:'16/03/2026', Nota:4},
-                ];
 
-                let fil = [...DB];
 
-                function nc(n){ return n>=8?'nh':n>=5?'nm':'nl'; }
-                function badge(m){
-                  if(m.includes('Eletrônico')) return '<span class=""badge bpe"">Pregão-E</span>';
-                  if(m.includes('Presencial'))  return '<span class=""badge bpp"">Pregão-P</span>';
-                  return '<span class=""badge bco"">Concorrência</span>';
-                }
+"
+            +
+            @"
+            const DB = " + jsonLicitacoesResumo + @";
 
-                function rowAll(r){
-                  return `<tr onclick=""host('url:${r.Url}')"">
-                    <td class=""num"">${r.Id}</td>
-                    <td>${badge(r.Modalidade)}</td>
-                    <td style=""max-width:140px;overflow:hidden;text-overflow:ellipsis"">${r.Orgao}</td>
-                    <td class=""obj"" style=""max-width:0;overflow:hidden;text-overflow:ellipsis"">${r.Objeto}</td>
-                    <td class=""dim"">${r.Local}</td>
-                    <td class=""dim"">${r.Dt}</td>
-                    <td class=""nota-cell ${nc(r.Nota)}"">${r.Nota}</td>
-                    <td class=""lnk""><a href=""${r.Url}"" onclick=""event.stopPropagation()"">PNCP ↗</a></td>
-                  </tr>`;
-                }
+            let fil = [...DB];
 
-                function rowSimple(r){
-                  return `<tr onclick=""host('url:${r.Url}')"">
-                    <td class=""num"">${r.Id}</td>
-                    <td style=""max-width:150px;overflow:hidden;text-overflow:ellipsis"">${r.Orgao}</td>
-                    <td class=""obj"" style=""max-width:0;overflow:hidden;text-overflow:ellipsis"">${r.Objeto}</td>
-                    <td class=""dim"">${r.Local}</td>
-                    <td class=""dim"">${r.Dt}</td>
-                    <td class=""nota-cell ${nc(r.Nota)}"">${r.Nota}</td>
-                    <td class=""lnk""><a href=""${r.Url}"" onclick=""event.stopPropagation()"">PNCP ↗</a></td>
-                  </tr>`;
-                }
+            function nc(n){ return n>=8?'nh':n>=5?'nm':'nl'; }
+            function badge(m){
+                if(m.includes('Eletrônico')) return '<span class=""badge bpe"">Pregão-E</span>';
+                if(m.includes('Presencial'))  return '<span class=""badge bpp"">Pregão-P</span>';
+                return '<span class=""badge bco"">Concorrência</span>';
+            }
 
-                function render(){
-                  document.getElementById('tb0').innerHTML = fil.map(rowAll).join('');
-                  document.getElementById('tb1').innerHTML = fil.filter(r=>r.Nota>=8).map(rowSimple).join('');
-                  document.getElementById('tb2').innerHTML = fil.filter(r=>r.Modalidade.includes('Eletrônico')).map(rowSimple).join('');
-                  document.getElementById('cnt').textContent = fil.length + ' de ' + DB.length + ' registros';
-                  const pg = document.getElementById('pg');
-                  pg.style.width = '0%';
-                  setTimeout(()=>{ pg.style.width='100%'; }, 30);
-                }
+            function rowAll(r){
+                return `<tr onclick=""host('url:${r.Url}')"">
+                <td class=""num"">${r.Id}</td>
+                <td>${badge(r.Modalidade)}</td>
+                <td style=""max-width:140px;overflow:hidden;text-overflow:ellipsis"">${r.Orgao}</td>
+                <td class=""obj"" style=""max-width:0;overflow:hidden;text-overflow:ellipsis"">${r.Objeto}</td>
+                <td class=""dim"">${r.Local}</td>
+                <td class=""dim"">${r.Dt}</td>
+                <td class=""nota-cell ${nc(r.Nota)}"">${r.Nota}</td>
+                <td class=""lnk""><a href=""${r.Url}"" onclick=""event.stopPropagation()"">PNCP ↗</a></td>
+                </tr>`;
+            }
 
-                function filtrar(){
-                  const obj  = document.getElementById('f-obj').value.toLowerCase();
-                  const mod  = document.getElementById('f-mod').value;
-                  const nota = parseInt(document.getElementById('f-nota').value)||0;
-                  fil = DB.filter(r =>
-                    (!obj  || r.Objeto.toLowerCase().includes(obj) || r.Orgao.toLowerCase().includes(obj)) &&
-                    (!mod  || r.Modalidade === mod) &&
-                    r.Nota >= nota
-                  );
-                  render();
-                }
+            function rowSimple(r){
+                return `<tr onclick=""host('url:${r.Url}')"">
+                <td class=""num"">${r.Id}</td>
+                <td style=""max-width:150px;overflow:hidden;text-overflow:ellipsis"">${r.Orgao}</td>
+                <td class=""obj"" style=""max-width:0;overflow:hidden;text-overflow:ellipsis"">${r.Objeto}</td>
+                <td class=""dim"">${r.Local}</td>
+                <td class=""dim"">${r.Dt}</td>
+                <td class=""nota-cell ${nc(r.Nota)}"">${r.Nota}</td>
+                <td class=""lnk""><a href=""${r.Url}"" onclick=""event.stopPropagation()"">PNCP ↗</a></td>
+                </tr>`;
+            }
 
-                function limpar(){
-                  document.getElementById('f-obj').value = '';
-                  document.getElementById('f-mod').value = '';
-                  document.getElementById('f-nota').value = '';
-                  fil = [...DB]; render();
-                }
+            function render(){
+                document.getElementById('tb0').innerHTML = fil.map(rowAll).join('');
+                document.getElementById('tb1').innerHTML = fil.filter(r=>r.Nota>=8).map(rowSimple).join('');
+                document.getElementById('tb2').innerHTML = fil.filter(r=>r.Modalidade.includes('Eletrônico')).map(rowSimple).join('');
+                document.getElementById('cnt').textContent = fil.length + ' de ' + DB.length + ' registros';
+                const pg = document.getElementById('pg');
+                pg.style.width = '0%';
+                setTimeout(()=>{ pg.style.width='100%'; }, 30);
+            }
 
-                // Abas
-                const panes = [...document.querySelectorAll('.tab-pane')];
-                const tabs  = [...document.querySelectorAll('.tab')];
-                function switchTab(i, el){
-                  panes.forEach(p=>p.classList.remove('active'));
-                  tabs.forEach(t=>t.classList.remove('active'));
-                  panes[i].classList.add('active'); el.classList.add('active');
-                }
-
-                // Tema
-                let dark = false;
-                function toggleTheme(){
-                  dark = !dark;
-                  document.body.dataset.theme = dark ? 'dark' : 'light';
-                  document.getElementById('knob').className = 'toggle-knob' + (dark?' r':'');
-                }
-
-                // Comunicação com WebView2 host
-                function host(msg){
-                  try { window.chrome.webview.postMessage(msg); } catch(e){}
-                }
-
-                // ── LOCKDOWN COMPLETO WEBVIEW2 ──
-                // 1. Botão direito
-                document.addEventListener('contextmenu', e => e.preventDefault());
-
-                // 2. Seleção de texto via teclado (Shift+setas, Ctrl+A etc.) — exceto em inputs
-                document.addEventListener('selectstart', e => {
-                  if (!['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) e.preventDefault();
-                });
-
-                // 3. Arrastar elementos
-                document.addEventListener('dragstart', e => e.preventDefault());
-
-                // 4. Atalhos de navegador
-                document.addEventListener('keydown', e => {
-                  const k = e.key.toUpperCase();
-                  const c = e.ctrlKey || e.metaKey;
-                  const bloqueados =
-                    e.key === 'F5'  ||                        // recarregar
-                    e.key === 'F12' ||                        // DevTools
-                    e.key === 'F3'  ||                        // localizar (Firefox)
-                    (c && k === 'R') ||                       // Ctrl+R — recarregar
-                    (c && k === 'F') ||                       // Ctrl+F — localizar
-                    (c && k === 'U') ||                       // Ctrl+U — ver fonte
-                    (c && k === 'S') ||                       // Ctrl+S — salvar
-                    (c && k === 'P') ||                       // Ctrl+P — imprimir
-                    (c && k === 'D') ||                       // Ctrl+D — favoritos
-                    (c && k === 'N') ||                       // Ctrl+N — nova janela
-                    (c && k === 'T') ||                       // Ctrl+T — nova aba
-                    (c && k === 'W') ||                       // Ctrl+W — fechar aba
-                    (c && k === 'H') ||                       // Ctrl+H — histórico
-                    (c && k === 'J') ||                       // Ctrl+J — downloads
-                    (c && k === 'L') ||                       // Ctrl+L — barra de endereço
-                    (c && k === 'E') ||                       // Ctrl+E — pesquisa
-                    (c && k === 'G') ||                       // Ctrl+G — localizar próximo
-                    (c && e.shiftKey && k === 'I') ||         // Ctrl+Shift+I — DevTools
-                    (c && e.shiftKey && k === 'J') ||         // Ctrl+Shift+J — Console
-                    (c && e.shiftKey && k === 'C') ||         // Ctrl+Shift+C — Inspecionar
-                    (c && e.shiftKey && k === 'K') ||         // Ctrl+Shift+K — Console Firefox
-                    (c && e.shiftKey && k === 'U') ||         // Ctrl+Shift+U — Ver fonte Firefox
-                    (e.altKey && e.key === 'ArrowLeft')  ||   // Alt+← — voltar
-                    (e.altKey && e.key === 'ArrowRight') ||   // Alt+→ — avançar
-                    (e.altKey && e.key === 'F4');             // Alt+F4 — fechar (opcional)
-                  if (bloqueados) e.preventDefault();
-                });
-
-                // 5. Zoom via scroll (Ctrl+Scroll)
-                document.addEventListener('wheel', e => {
-                  if (e.ctrlKey) e.preventDefault();
-                }, { passive: false });
-
-                // 6. Zoom via pinch (touch)
-                document.addEventListener('touchstart', e => {
-                  if (e.touches.length > 1) e.preventDefault();
-                }, { passive: false });
-                document.addEventListener('touchmove', e => {
-                  if (e.touches.length > 1) e.preventDefault();
-                }, { passive: false });
-
+            function filtrar(){
+                const obj  = document.getElementById('f-obj').value.toLowerCase();
+                const mod  = document.getElementById('f-mod').value;
+                const nota = parseInt(document.getElementById('f-nota').value)||0;
+                fil = DB.filter(r =>
+                (!obj  || r.Objeto.toLowerCase().includes(obj) || r.Orgao.toLowerCase().includes(obj)) &&
+                (!mod  || r.Modalidade === mod) &&
+                r.Nota >= nota
+                );
                 render();
-                </script>
-                </body>
-                </html>            
+            }
+
+            function limpar(){
+                document.getElementById('f-obj').value = '';
+                document.getElementById('f-mod').value = '';
+                document.getElementById('f-nota').value = '';
+                fil = [...DB]; render();
+            }
+
+            // Abas
+            const panes = [...document.querySelectorAll('.tab-pane')];
+            const tabs  = [...document.querySelectorAll('.tab')];
+            function switchTab(i, el){
+                panes.forEach(p=>p.classList.remove('active'));
+                tabs.forEach(t=>t.classList.remove('active'));
+                panes[i].classList.add('active'); el.classList.add('active');
+            }
+
+            // Tema
+            let dark = false;
+            function toggleTheme(){
+                dark = !dark;
+                document.body.dataset.theme = dark ? 'dark' : 'light';
+                document.getElementById('knob').className = 'toggle-knob' + (dark?' r':'');
+            }
+
+            // Comunicação com WebView2 host
+            function host(msg){
+                try { window.chrome.webview.postMessage(msg); } catch(e){}
+            }
+
+            // ── LOCKDOWN COMPLETO WEBVIEW2 ──
+            // 1. Botão direito
+            document.addEventListener('contextmenu', e => e.preventDefault());
+
+            // 2. Seleção de texto via teclado (Shift+setas, Ctrl+A etc.) — exceto em inputs
+            document.addEventListener('selectstart', e => {
+                if (!['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) e.preventDefault();
+            });
+
+            // 3. Arrastar elementos
+            document.addEventListener('dragstart', e => e.preventDefault());
+
+            // 4. Atalhos de navegador
+            document.addEventListener('keydown', e => {
+                const k = e.key.toUpperCase();
+                const c = e.ctrlKey || e.metaKey;
+                const bloqueados =
+                e.key === 'F5'  ||                        // recarregar
+                e.key === 'F12' ||                        // DevTools
+                e.key === 'F3'  ||                        // localizar (Firefox)
+                (c && k === 'R') ||                       // Ctrl+R — recarregar
+                (c && k === 'F') ||                       // Ctrl+F — localizar
+                (c && k === 'U') ||                       // Ctrl+U — ver fonte
+                (c && k === 'S') ||                       // Ctrl+S — salvar
+                (c && k === 'P') ||                       // Ctrl+P — imprimir
+                (c && k === 'D') ||                       // Ctrl+D — favoritos
+                (c && k === 'N') ||                       // Ctrl+N — nova janela
+                (c && k === 'T') ||                       // Ctrl+T — nova aba
+                (c && k === 'W') ||                       // Ctrl+W — fechar aba
+                (c && k === 'H') ||                       // Ctrl+H — histórico
+                (c && k === 'J') ||                       // Ctrl+J — downloads
+                (c && k === 'L') ||                       // Ctrl+L — barra de endereço
+                (c && k === 'E') ||                       // Ctrl+E — pesquisa
+                (c && k === 'G') ||                       // Ctrl+G — localizar próximo
+                (c && e.shiftKey && k === 'I') ||         // Ctrl+Shift+I — DevTools
+                (c && e.shiftKey && k === 'J') ||         // Ctrl+Shift+J — Console
+                (c && e.shiftKey && k === 'C') ||         // Ctrl+Shift+C — Inspecionar
+                (c && e.shiftKey && k === 'K') ||         // Ctrl+Shift+K — Console Firefox
+                (c && e.shiftKey && k === 'U') ||         // Ctrl+Shift+U — Ver fonte Firefox
+                (e.altKey && e.key === 'ArrowLeft')  ||   // Alt+← — voltar
+                (e.altKey && e.key === 'ArrowRight') ||   // Alt+→ — avançar
+                (e.altKey && e.key === 'F4');             // Alt+F4 — fechar (opcional)
+                if (bloqueados) e.preventDefault();
+            });
+
+            // 5. Zoom via scroll (Ctrl+Scroll)
+            document.addEventListener('wheel', e => {
+                if (e.ctrlKey) e.preventDefault();
+            }, { passive: false });
+
+            // 6. Zoom via pinch (touch)
+            document.addEventListener('touchstart', e => {
+                if (e.touches.length > 1) e.preventDefault();
+            }, { passive: false });
+            document.addEventListener('touchmove', e => {
+                if (e.touches.length > 1) e.preventDefault();
+            }, { passive: false });
+
+            render();
+            </script>
+            </body>
+            </html>            
             ";
+
+            return resposta;
         }
     }
 }

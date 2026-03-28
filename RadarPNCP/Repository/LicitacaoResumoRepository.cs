@@ -93,5 +93,93 @@ ELSE
                 }
             }
         }
+
+        public static async Task<List<LicitacaoResumo>> ListarAsync(
+    string? modalidade = null,
+    string? orgao = null,
+    DateTime? dataInicio = null,
+    DateTime? dataFim = null,
+    int pagina = 1,
+    int tamanhoPagina = 5000)
+        {
+            string connectionString = "Data Source=DESKTOP-P93N2NG\\SQLEXPRESS;Initial Catalog=RadarPNCP;Integrated Security=True;TrustServerCertificate=True;";
+
+            var resultado = new List<LicitacaoResumo>();
+
+            using (var conn = new SqlConnection(connectionString))
+            {
+                await conn.OpenAsync();
+
+                var query = new StringBuilder(@"
+            SELECT
+                UrlDetalhes,
+                IdPNCP,
+                Modalidade,
+                Orgao,
+                Objeto,
+                Local,
+                UltimaAtualizacao,
+                Nota
+            FROM LicitacaoResumo
+            WHERE 1=1
+        ");
+
+                if (!string.IsNullOrWhiteSpace(modalidade))
+                    query.Append(" AND Modalidade = @Modalidade");
+
+                if (!string.IsNullOrWhiteSpace(orgao))
+                    query.Append(" AND Orgao = @Orgao");
+
+                if (dataInicio.HasValue)
+                    query.Append(" AND UltimaAtualizacao >= @DataInicio");
+
+                if (dataFim.HasValue)
+                    query.Append(" AND UltimaAtualizacao <= @DataFim");
+
+                query.Append(@"
+            ORDER BY UltimaAtualizacao DESC
+            OFFSET @Offset ROWS
+            FETCH NEXT @TamanhoPagina ROWS ONLY
+        ");
+
+                using (var cmd = new SqlCommand(query.ToString(), conn))
+                {
+                    if (!string.IsNullOrWhiteSpace(modalidade))
+                        cmd.Parameters.AddWithValue("@Modalidade", modalidade);
+
+                    if (!string.IsNullOrWhiteSpace(orgao))
+                        cmd.Parameters.AddWithValue("@Orgao", orgao);
+
+                    if (dataInicio.HasValue)
+                        cmd.Parameters.AddWithValue("@DataInicio", dataInicio.Value);
+
+                    if (dataFim.HasValue)
+                        cmd.Parameters.AddWithValue("@DataFim", dataFim.Value);
+
+                    cmd.Parameters.AddWithValue("@Offset", (pagina - 1) * tamanhoPagina);
+                    cmd.Parameters.AddWithValue("@TamanhoPagina", tamanhoPagina);
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            resultado.Add(new LicitacaoResumo
+                            {
+                                UrlDetalhes = reader["UrlDetalhes"] as string,
+                                IdPNCP = reader["IdPNCP"] as string,
+                                Modalidade = reader["Modalidade"] as string,
+                                Orgao = reader["Orgao"] as string,
+                                Objeto = reader["Objeto"] as string,
+                                Local = reader["Local"] as string,
+                                UltimaAtualizacao = (DateTime)reader["UltimaAtualizacao"],
+                                Nota = (int)reader["Nota"]
+                            });
+                        }
+                    }
+                }
+            }
+
+            return resultado;
+        }
     }
 }

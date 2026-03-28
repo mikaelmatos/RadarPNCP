@@ -14,20 +14,23 @@ namespace RadarPNCP
         int novas = 0;
         int jaExtistia = 0;
         string promptBase = "";
+        List<LicitacaoResumo> licitacoes = new List<LicitacaoResumo>();
 
         public Form1()
         {
             InitializeComponent();
 
             webView22.CoreWebView2InitializationCompleted += WebView22_Initialized;
-            webView22.EnsureCoreWebView2Async(null);
+            webView22.EnsureCoreWebView2Async(null);           
         }
-        private void WebView22_Initialized(object sender, CoreWebView2InitializationCompletedEventArgs e)
+        private async void WebView22_Initialized(object sender, CoreWebView2InitializationCompletedEventArgs e)
         {
             if (e.IsSuccess)
             {
                 webView22.WebMessageReceived += WebView22_MessageReceived;
-                webView22.NavigateToString(Base.HomeDarkLight());
+
+                licitacoes = await LicitacaoResumoRepository.ListarAsync();
+                webView22.NavigateToString(Base.HomeDarkLight(licitacoes));              
             }
         }
         private void WebView22_MessageReceived(object sender, CoreWebView2WebMessageReceivedEventArgs e)
@@ -129,8 +132,6 @@ namespace RadarPNCP
 
         public async Task<List<LicitacaoResumo>> Extrair(string termo, int paginasQnt)
         {
-            List<LicitacaoResumo> licitacoes = new List<LicitacaoResumo>();
-
             for (int pagina = 0; pagina < paginasQnt; pagina++)
             {
                 webView21.CoreWebView2.Navigate("https://pncp.gov.br/app/editais?q=" + termo + "&status=recebendo_proposta&pagina=" + pagina + "&tipos=3%7C1%7C4&tam_pagina=100");
@@ -177,6 +178,8 @@ namespace RadarPNCP
                             await LicitacaoResumoRepository.InserirSeNaoExistirAsync(licitacaoResumo);
 
                             licitacoes.Add(licitacaoResumo);
+                            await webView22.CoreWebView2.ExecuteScriptAsync(Base.AtualizarDados(licitacoes));
+
                             novas++;
                         }
                         else

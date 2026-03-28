@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RadarPNCP")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f982481f1497b1f3d72ce680a513a581e1b3a0a9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+db6eb9d919939b4c3eeced76c351b7ed796b0385")]
 [assembly: System.Reflection.AssemblyProductAttribute("RadarPNCP")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RadarPNCP")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

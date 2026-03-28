@@ -54,7 +54,7 @@
             // webView22
             // 
             webView22.AllowExternalDrop = true;
-            webView22.BackColor = Color.IndianRed;
+            webView22.BackColor = Color.Cyan;
             webView22.CreationProperties = null;
             webView22.DefaultBackgroundColor = Color.White;
             webView22.Location = new Point(0, 0);
