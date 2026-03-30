@@ -33,12 +33,13 @@ namespace RadarPNCP.Htmls
 
             string jsonLicitacoesResumo = JsonSerializer.Serialize(licitacoesResumo);
 
-            string resposta = 
+            string resposta =
                 @"
                 <!DOCTYPE html>
                 <html lang=""pt-BR"">
                 <head>
                 <meta charset=""UTF-8"">
+                <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
                 <title>Radar PNCP — Roque Systems</title>
                 <style>
                 @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600&display=swap');
@@ -72,6 +73,7 @@ namespace RadarPNCP.Htmls
                   --row-even:   rgba(0,140,200,.06);
                   --row-hover:  rgba(0,200,232,.13);
                   --hdr:        linear-gradient(90deg,rgba(21,101,192,.55),rgba(0,140,180,.3));
+                  --hdr-bg:     #0d2a45;
                   --tab-bg:     #0b1c30;
                   --tab-act:    #0e2440;
                   --shadow:     0 0 18px rgba(0,120,180,.1);
@@ -98,6 +100,7 @@ namespace RadarPNCP.Htmls
                   --row-even:   rgba(0,100,160,.04);
                   --row-hover:  rgba(0,140,200,.09);
                   --hdr:        linear-gradient(90deg,rgba(0,100,160,.1),rgba(0,130,170,.05));
+                  --hdr-bg:     #dde8f2;
                   --tab-bg:     #dde8f2;
                   --tab-act:    #ffffff;
                   --shadow:     0 2px 12px rgba(0,80,140,.08);
@@ -112,7 +115,9 @@ namespace RadarPNCP.Htmls
                 }
 
                 html, body {
-                  width: 804px; height: 424px;
+                  width: 100%;
+                  height: 100%;
+                  min-width: 480px;
                   overflow: hidden;
                   background: var(--bg);
                   font-family: 'Exo 2', sans-serif;
@@ -123,7 +128,7 @@ namespace RadarPNCP.Htmls
 
                 #app {
                   display: flex; flex-direction: column;
-                  width: 804px; height: 424px;
+                  width: 100%; height: 100%;
                   padding: 7px 8px 0; gap: 5px;
                 }
 
@@ -149,6 +154,7 @@ namespace RadarPNCP.Htmls
                   font-size: 14px; font-weight: 600;
                   letter-spacing: .06em; color: var(--cyan);
                   text-transform: uppercase; flex: 1;
+                  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
                 }
                 .topbar-title span {
                   font-weight: 300; color: var(--text-dim);
@@ -159,7 +165,7 @@ namespace RadarPNCP.Htmls
                 .theme-toggle {
                   display: flex; align-items: center; gap: 6px;
                   font-size: 11px; color: var(--text-dim);
-                  cursor: pointer; user-select: none;
+                  cursor: pointer; user-select: none; flex-shrink: 0;
                 }
                 .toggle-track {
                   width: 34px; height: 18px;
@@ -184,7 +190,8 @@ namespace RadarPNCP.Htmls
                 /* FILTROS */
                 #filters {
                   display: flex; gap: 6px; align-items: center;
-                  flex-shrink: 0; height: 27px; padding: 0 2px;
+                  flex-shrink: 0; min-height: 27px;
+                  padding: 0 2px; flex-wrap: wrap;
                 }
                 .fl { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: .05em; white-space: nowrap; }
 
@@ -197,7 +204,7 @@ namespace RadarPNCP.Htmls
                   transition: border-color var(--tr), box-shadow var(--tr);
                 }
                 .fi:focus { border-color: var(--cyan); box-shadow: 0 0 0 2px rgba(0,180,220,.12); }
-                .fi.wide { flex: 1; }
+                .fi.wide { flex: 1; min-width: 120px; }
                 .fi.sm   { width: 120px; }
                 .fi.xs   { width: 48px; }
 
@@ -219,7 +226,7 @@ namespace RadarPNCP.Htmls
                 /* MAIN / ABAS */
                 #main { flex: 1; display: flex; flex-direction: column; min-height: 0; }
 
-                .tabs-bar { display: flex; gap: 3px; padding: 0 2px; align-items: flex-end; flex-shrink: 0; }
+                .tabs-bar { display: flex; gap: 3px; padding: 0 2px; align-items: flex-end; flex-shrink: 0; flex-wrap: wrap; }
 
                 .tab {
                   height: 27px; padding: 0 13px;
@@ -256,15 +263,22 @@ namespace RadarPNCP.Htmls
                 .tw::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
                 .tw::-webkit-scrollbar-thumb:hover { background: var(--cyan2); }
 
-                table { width: 100%; border-collapse: collapse; font-size: 11px; }
+                table { width: 100%; border-collapse: collapse; font-size: 11px; table-layout: fixed; }
 
-                thead tr { background: var(--hdr); position: sticky; top: 0; z-index: 2; }
+                /* FIX: cabeçalho opaco para não misturar com conteúdo no scroll */
+                thead tr {
+                  background-color: var(--hdr-bg);
+                  background-image: var(--hdr);
+                  position: sticky; top: 0; z-index: 2;
+                  box-shadow: 0 1px 0 var(--border);
+                }
 
                 th {
                   padding: 5px 8px; text-align: left; font-weight: 600;
                   letter-spacing: .05em; text-transform: uppercase;
                   font-size: 9.5px; color: var(--cyan);
                   border-bottom: 1px solid var(--border); white-space: nowrap;
+                  overflow: hidden; text-overflow: ellipsis;
                 }
 
                 tbody tr { border-bottom: 1px solid rgba(0,0,0,.04); transition: background .1s; cursor: pointer; }
@@ -274,7 +288,7 @@ namespace RadarPNCP.Htmls
 
                 td { padding: 4px 8px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-                .obj { max-width: 0; }
+                .obj { width: auto; }
                 .num { color: var(--text-dim); font-size: 10px; }
                 .dim { color: var(--text-dim); font-size: 10.5px; }
 
@@ -305,6 +319,29 @@ namespace RadarPNCP.Htmls
                 #cnt { color: var(--text); font-weight: 500; }
                 .pgbar { width: 70px; height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
                 .pgfill { height: 100%; width: 0%; background: var(--prog); border-radius: 2px; transition: width .5s ease; }
+
+                /* ── RESPONSIVO ── */
+                @media (max-width: 640px) {
+                  html, body { font-size: 11px; }
+
+                  #filters { gap: 4px; }
+                  .fi.sm { width: 100px; }
+                  .topbar-title span { display: none; }
+
+                  .tab { padding: 0 9px; font-size: 9.5px; }
+
+                  th, td { padding: 4px 5px; font-size: 10px; }
+                  .badge { font-size: 9px; padding: 1px 4px; }
+
+                  /* Oculta colunas menos importantes em telas pequenas */
+                  .col-local { display: none; }
+                }
+
+                @media (max-width: 420px) {
+                  .col-dt { display: none; }
+                  .fi.sm  { width: 80px; }
+                  .tab { padding: 0 7px; font-size: 9px; }
+                }
                 </style>
                 </head>
                 <body data-theme=""light"">
@@ -360,16 +397,15 @@ namespace RadarPNCP.Htmls
 
                     <div class=""tabs-content"">
 
-                      <!-- ABA 0 -->
+                      <!-- ABA 0 — Todas -->
                       <div class=""tab-pane active"" id=""p0"">
                         <div class=""tw""><table>
                           <thead><tr>
-                            <th style=""width:32px"">#</th>
                             <th style=""width:100px"">Modalidade</th>
                             <th style=""width:140px"">Órgão</th>
                             <th>Objeto</th>
-                            <th style=""width:90px"">Local</th>
-                            <th style=""width:78px"">Atualização</th>
+                            <th class=""col-local"" style=""width:90px"">Local</th>
+                            <th class=""col-dt"" style=""width:78px"">Atualização</th>
                             <th style=""width:40px;text-align:center"">Nota</th>
                             <th style=""width:46px"">Link</th>
                           </tr></thead>
@@ -377,15 +413,15 @@ namespace RadarPNCP.Htmls
                         </table></div>
                       </div>
 
-                      <!-- ABA 1 -->
+                      <!-- ABA 1 — Alta Nota -->
                       <div class=""tab-pane"" id=""p1"">
                         <div class=""tw""><table>
                           <thead><tr>
-                            <th style=""width:32px"">#</th>
-                            <th style=""width:150px"">Órgão</th>
+                            <th style=""width:100px"">Modalidade</th>
+                            <th style=""width:140px"">Órgão</th>
                             <th>Objeto</th>
-                            <th style=""width:90px"">Local</th>
-                            <th style=""width:78px"">Atualização</th>
+                            <th class=""col-local"" style=""width:90px"">Local</th>
+                            <th class=""col-dt"" style=""width:78px"">Atualização</th>
                             <th style=""width:40px;text-align:center"">Nota</th>
                             <th style=""width:46px"">Link</th>
                           </tr></thead>
@@ -393,15 +429,15 @@ namespace RadarPNCP.Htmls
                         </table></div>
                       </div>
 
-                      <!-- ABA 2 -->
+                      <!-- ABA 2 — Pregão Eletrônico -->
                       <div class=""tab-pane"" id=""p2"">
                         <div class=""tw""><table>
                           <thead><tr>
-                            <th style=""width:32px"">#</th>
-                            <th style=""width:150px"">Órgão</th>
+                            <th style=""width:100px"">Modalidade</th>
+                            <th style=""width:140px"">Órgão</th>
                             <th>Objeto</th>
-                            <th style=""width:90px"">Local</th>
-                            <th style=""width:78px"">Atualização</th>
+                            <th class=""col-local"" style=""width:90px"">Local</th>
+                            <th class=""col-dt"" style=""width:78px"">Atualização</th>
                             <th style=""width:40px;text-align:center"">Nota</th>
                             <th style=""width:46px"">Link</th>
                           </tr></thead>
@@ -443,12 +479,11 @@ namespace RadarPNCP.Htmls
 
             function rowAll(r){
                 return `<tr onclick=""host('url:${r.Url}')"">
-                <td class=""num"">${r.Id}</td>
                 <td>${badge(r.Modalidade)}</td>
-                <td style=""max-width:140px;overflow:hidden;text-overflow:ellipsis"">${r.Orgao}</td>
-                <td class=""obj"" style=""max-width:0;overflow:hidden;text-overflow:ellipsis"">${r.Objeto}</td>
-                <td class=""dim"">${r.Local}</td>
-                <td class=""dim"">${r.Dt}</td>
+                <td style=""overflow:hidden;text-overflow:ellipsis"">${r.Orgao}</td>
+                <td class=""obj"" style=""overflow:hidden;text-overflow:ellipsis"">${r.Objeto}</td>
+                <td class=""dim col-local"">${r.Local}</td>
+                <td class=""dim col-dt"">${r.Dt}</td>
                 <td class=""nota-cell ${nc(r.Nota)}"">${r.Nota}</td>
                 <td class=""lnk""><a href=""${r.Url}"" onclick=""event.stopPropagation()"">PNCP ↗</a></td>
                 </tr>`;
@@ -456,11 +491,11 @@ namespace RadarPNCP.Htmls
 
             function rowSimple(r){
                 return `<tr onclick=""host('url:${r.Url}')"">
-                <td class=""num"">${r.Id}</td>
-                <td style=""max-width:150px;overflow:hidden;text-overflow:ellipsis"">${r.Orgao}</td>
-                <td class=""obj"" style=""max-width:0;overflow:hidden;text-overflow:ellipsis"">${r.Objeto}</td>
-                <td class=""dim"">${r.Local}</td>
-                <td class=""dim"">${r.Dt}</td>
+                <td>${badge(r.Modalidade)}</td>
+                <td style=""overflow:hidden;text-overflow:ellipsis"">${r.Orgao}</td>
+                <td class=""obj"" style=""overflow:hidden;text-overflow:ellipsis"">${r.Objeto}</td>
+                <td class=""dim col-local"">${r.Local}</td>
+                <td class=""dim col-dt"">${r.Dt}</td>
                 <td class=""nota-cell ${nc(r.Nota)}"">${r.Nota}</td>
                 <td class=""lnk""><a href=""${r.Url}"" onclick=""event.stopPropagation()"">PNCP ↗</a></td>
                 </tr>`;
@@ -478,11 +513,11 @@ namespace RadarPNCP.Htmls
 
             function filtrar(){
                 const obj  = document.getElementById('f-obj').value.toLowerCase();
-                const mod  = document.getElementById('f-mod').value;
+                const mod  = document.getElementById('f-mod').value.toLowerCase();
                 const nota = parseInt(document.getElementById('f-nota').value)||0;
                 fil = DB.filter(r =>
                 (!obj  || r.Objeto.toLowerCase().includes(obj) || r.Orgao.toLowerCase().includes(obj)) &&
-                (!mod  || r.Modalidade === mod) &&
+                (!mod  || r.Modalidade.toLowerCase().includes(mod)) &&
                 r.Nota >= nota
                 );
                 render();
@@ -534,31 +569,31 @@ namespace RadarPNCP.Htmls
                 const k = e.key.toUpperCase();
                 const c = e.ctrlKey || e.metaKey;
                 const bloqueados =
-                e.key === 'F5'  ||                        // recarregar
-                e.key === 'F12' ||                        // DevTools
-                e.key === 'F3'  ||                        // localizar (Firefox)
-                (c && k === 'R') ||                       // Ctrl+R — recarregar
-                (c && k === 'F') ||                       // Ctrl+F — localizar
-                (c && k === 'U') ||                       // Ctrl+U — ver fonte
-                (c && k === 'S') ||                       // Ctrl+S — salvar
-                (c && k === 'P') ||                       // Ctrl+P — imprimir
-                (c && k === 'D') ||                       // Ctrl+D — favoritos
-                (c && k === 'N') ||                       // Ctrl+N — nova janela
-                (c && k === 'T') ||                       // Ctrl+T — nova aba
-                (c && k === 'W') ||                       // Ctrl+W — fechar aba
-                (c && k === 'H') ||                       // Ctrl+H — histórico
-                (c && k === 'J') ||                       // Ctrl+J — downloads
-                (c && k === 'L') ||                       // Ctrl+L — barra de endereço
-                (c && k === 'E') ||                       // Ctrl+E — pesquisa
-                (c && k === 'G') ||                       // Ctrl+G — localizar próximo
-                (c && e.shiftKey && k === 'I') ||         // Ctrl+Shift+I — DevTools
-                (c && e.shiftKey && k === 'J') ||         // Ctrl+Shift+J — Console
-                (c && e.shiftKey && k === 'C') ||         // Ctrl+Shift+C — Inspecionar
-                (c && e.shiftKey && k === 'K') ||         // Ctrl+Shift+K — Console Firefox
-                (c && e.shiftKey && k === 'U') ||         // Ctrl+Shift+U — Ver fonte Firefox
-                (e.altKey && e.key === 'ArrowLeft')  ||   // Alt+← — voltar
-                (e.altKey && e.key === 'ArrowRight') ||   // Alt+→ — avançar
-                (e.altKey && e.key === 'F4');             // Alt+F4 — fechar (opcional)
+                e.key === 'F5'  ||
+                e.key === 'F12' ||
+                e.key === 'F3'  ||
+                (c && k === 'R') ||
+                (c && k === 'F') ||
+                (c && k === 'U') ||
+                (c && k === 'S') ||
+                (c && k === 'P') ||
+                (c && k === 'D') ||
+                (c && k === 'N') ||
+                (c && k === 'T') ||
+                (c && k === 'W') ||
+                (c && k === 'H') ||
+                (c && k === 'J') ||
+                (c && k === 'L') ||
+                (c && k === 'E') ||
+                (c && k === 'G') ||
+                (c && e.shiftKey && k === 'I') ||
+                (c && e.shiftKey && k === 'J') ||
+                (c && e.shiftKey && k === 'C') ||
+                (c && e.shiftKey && k === 'K') ||
+                (c && e.shiftKey && k === 'U') ||
+                (e.altKey && e.key === 'ArrowLeft')  ||
+                (e.altKey && e.key === 'ArrowRight') ||
+                (e.altKey && e.key === 'F4');
                 if (bloqueados) e.preventDefault();
             });
 

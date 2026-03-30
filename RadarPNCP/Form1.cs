@@ -21,7 +21,7 @@ namespace RadarPNCP
             InitializeComponent();
 
             webView22.CoreWebView2InitializationCompleted += WebView22_Initialized;
-            webView22.EnsureCoreWebView2Async(null);           
+            webView22.EnsureCoreWebView2Async(null);
         }
         private async void WebView22_Initialized(object sender, CoreWebView2InitializationCompletedEventArgs e)
         {
@@ -30,7 +30,7 @@ namespace RadarPNCP
                 webView22.WebMessageReceived += WebView22_MessageReceived;
 
                 licitacoes = await LicitacaoResumoRepository.ListarAsync();
-                webView22.NavigateToString(Base.HomeDarkLight(licitacoes));              
+                webView22.NavigateToString(Base.HomeDarkLight(licitacoes));
             }
         }
         private void WebView22_MessageReceived(object sender, CoreWebView2WebMessageReceivedEventArgs e)
@@ -69,15 +69,19 @@ namespace RadarPNCP
 
             progressBar1.Maximum = termos.Split("\n").ToList().Count;
 
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            stopwatch.Start();
+
             foreach (string termo in termos.Split("\n").ToList())
             {
                 licitacoesPrincipal.AddRange(await Extrair(termo, 2));
 
                 progressBar1.Value = progressBar1.Value + 1;
-                labelProgresso.Text = progressBar1.Value + "/" + progressBar1.Maximum + " (" + novas + " novo" + (novas > 1 ? "s" : "") + " registro" + (novas > 1 ? "s" : "") + ")";
+                labelProgresso.Text = progressBar1.Value + "/" + progressBar1.Maximum + " (" + novas + " novo" + (novas > 1 ? "s" : "") + " registro" + (novas > 1 ? "s" : "") + " - " + +jaExtistia + " registro" + (jaExtistia > 1 ? "s" : "") + " já existia" + (jaExtistia > 1 ? "m" : "") + ") " + stopwatch.Elapsed.ToString().Split('.')[0];
             }
 
-            MessageBox.Show("Processo finalizado! Novas: " + novas + " Já existiam: " + jaExtistia + "(" + novas + " novo " + (novas > 1 ? "s" : "") + " registro" + (novas > 1 ? "s" : "") + ")");
+            stopwatch.Stop();
+            MessageBox.Show("Processo finalizado! Novas: " + novas + " Já existiam: " + jaExtistia + "(" + novas + " novo " + (novas > 1 ? "s" : "") + " registro" + (novas > 1 ? "s" : "") + ") - Tempo gasto: " + stopwatch.Elapsed);
         }
 
         private void WebView21_CoreWebView2InitializationCompleted(object? sender, CoreWebView2InitializationCompletedEventArgs e)

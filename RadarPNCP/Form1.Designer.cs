@@ -42,7 +42,6 @@
             // webView21
             // 
             webView21.AllowExternalDrop = true;
-            webView21.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             webView21.CreationProperties = null;
             webView21.DefaultBackgroundColor = Color.White;
             webView21.Location = new Point(1, 1);
@@ -54,6 +53,7 @@
             // webView22
             // 
             webView22.AllowExternalDrop = true;
+            webView22.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             webView22.BackColor = Color.Cyan;
             webView22.CreationProperties = null;
             webView22.DefaultBackgroundColor = Color.White;
@@ -65,6 +65,7 @@
             // 
             // progressBar1
             // 
+            progressBar1.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             progressBar1.Location = new Point(0, 441);
             progressBar1.Name = "progressBar1";
             progressBar1.Size = new Size(804, 12);
@@ -72,6 +73,7 @@
             // 
             // labelProgresso
             // 
+            labelProgresso.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             labelProgresso.AutoSize = true;
             labelProgresso.Location = new Point(1, 426);
             labelProgresso.Name = "labelProgresso";
@@ -81,6 +83,7 @@
             // 
             // panel1
             // 
+            panel1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             panel1.BackColor = Color.White;
             panel1.Controls.Add(progressBar1);
             panel1.Controls.Add(labelProgresso);
@@ -98,8 +101,6 @@
             Controls.Add(panel1);
             Controls.Add(webView21);
             Icon = (Icon)resources.GetObject("$this.Icon");
-            MaximizeBox = false;
-            MaximumSize = new Size(820, 490);
             MinimumSize = new Size(820, 490);
             Name = "Form1";
             StartPosition = FormStartPosition.CenterScreen;
